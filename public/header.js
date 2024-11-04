@@ -1,7 +1,9 @@
+const BASE_URL = '/plugin-test-sdk-install/';
+
 const HEADER_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/multi-page/login/', label: 'Login' },
-  { href: '/multi-page/about/', label: 'About' },
+  { href: BASE_URL, label: 'Home' },
+  { href: BASE_URL + 'multi-page/login/', label: 'Login' },
+  { href: BASE_URL + 'multi-page/about/', label: 'About' },
 ];
 
 const links = HEADER_LINKS.map((link) => {
