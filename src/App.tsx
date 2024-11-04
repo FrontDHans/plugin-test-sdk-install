@@ -1,55 +1,10 @@
-import { useContext, useRef } from 'react';
-import './App.css';
+import './app.css';
+import { useContext } from 'react';
 import { FrontContext } from './providers/frontContext';
-import Front from '@frontapp/plugin-sdk';
-
-const link = 'https://www.google.com';
-
-function anchorListener(event: MouseEvent) {
-  // No need to do anything if the click did not use the default button.
-  if (event.button !== 0) return;
-
-  // Find the targetted anchor element.
-  const { target } = event;
-  const anchorElement =
-    target instanceof window.HTMLElement ? target.closest('a') : null;
-
-  // We can't do anything without an href
-  if (!anchorElement || !anchorElement.href) return;
-
-  // Don't do anything if the anchor is not opening a new window nor is a mailto link.
-  if (
-    anchorElement.target !== '_blank' &&
-    !anchorElement.href.startsWith('mailto:')
-  )
-    return;
-
-  // Parse the href to support relative paths.
-  const url = new URL(anchorElement.href, window.location.href);
-
-  event.preventDefault();
-  Front.openUrl(url.href);
-}
-
-function delegateAnchorClicksToFront() {
-  // Traps are not needed in a non-embedded context.
-  if (window.parent === window.self) return;
-
-  // Capture clicks.
-  window.addEventListener('click', anchorListener);
-}
-
-function removeDelegateAnchorClicksToFront() {
-  window.removeEventListener('click', anchorListener);
-}
+// import Front from '@frontapp/plugin-sdk';
 
 // Methods to open a link
-// - Anchor link with the different target values (self, blank, parent, top)
-// - window.open
-// - Any other javascript API to open new windows?
 // Type of URLS
-// - Relative URLs
-// - URLs hosted on a different domain as the plugin
 // - URLs with different protocols than http
 // Environments
 // - In the desktop app
@@ -62,66 +17,116 @@ function removeDelegateAnchorClicksToFront() {
 //   - Can it access its parent?
 //   - Can it escape the sandbox defined by the iframe?
 
+const APP_BASE_URL = '/plugin-test-sdk-install/';
+const TARGET_COMBINATIONS = ['_self', '_blank', '_parent', '_top'];
+const RELATIVE_HREF = `${APP_BASE_URL}relative/`;
+const DIFFERENT_DOMAIN_HREF = 'https://google.com';
+
 export function App() {
   const frontContext = useContext(FrontContext);
-  const windowOpenRef = useRef(window.open);
 
-  if (frontContext == null) {
+  function renderAnchorLinks(href: string, title: string) {
     return (
       <div>
-        <p>Connecting to the Front context.</p>
+        <h3>{title}</h3>
+        <p>{`<a href="${href}" >`}</p>
+        <ul>
+          {TARGET_COMBINATIONS.map((target) => (
+            <li>
+              <a href={href} target={target}>
+                {target}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
 
-  function windowOpen() {
-    window.open(link);
-  }
-
-  function frontOpen() {
-    frontContext?.openUrl(link);
-  }
-
-  function delegateAnchors() {
-    delegateAnchorClicksToFront();
-  }
-  function removeDelegate() {
-    removeDelegateAnchorClicksToFront();
-  }
-
-  function delegateOpens() {
-    window.open = function (url?: string | URL): Window | null {
-      if (url == null) {
-        return null;
-      }
-      Front.openUrl(String(url));
-      return null;
-    };
-  }
-
-  function resetOpens() {
-    window.open = windowOpenRef.current;
-  }
-
-  return (
-    <>
-      <h1>Local React App</h1>
-      <div className="links-container">
-        <a href={link}>Regular link</a>
-        <a href={link} target="_blank" rel="noreferrer">
-          Target _blank
-        </a>
-        <button onClick={windowOpen}>window.open()</button>
-        <button onClick={frontOpen}>Front.openUrl()</button>
-
-        <button onClick={delegateAnchors}>Delegate Anchor Clicks</button>
-        <button onClick={removeDelegate}>Remove event listener</button>
-
-        <button onClick={delegateOpens}>Delegate opens</button>
-        <button onClick={resetOpens}>Remove delegate opens</button>
-
-        <button>Foo</button>
+  function renderJavaScriptApis(href: string, title: string) {
+    return (
+      <div>
+        <h3>{title}</h3>
+        <p>{`const url = "${href}"`}</p>
+        <ul>
+          {TARGET_COMBINATIONS.map((target) => (
+            <li>
+              <button
+                onClick={() => window.open(href, target)}
+              >{`window.open(url, "${target}")`}</button>
+            </li>
+          ))}
+          <li>
+            <button onClick={() => window.open(href)}>window.open(url)</button>
+          </li>
+          <li>
+            <button onClick={() => (window.location.href = href)}>
+              window.location.href = url
+            </button>
+          </li>
+          <li>
+            <button onClick={() => window.location.assign(href)}>
+              window.location.assign(url)
+            </button>
+          </li>
+          <li>
+            <button onClick={() => window.location.replace(href)}>
+              window.location.replace(url)
+            </button>
+          </li>
+        </ul>
       </div>
-    </>
+    );
+  }
+
+  function renderFrontApi(href: string, title: string) {
+    return (
+      <div>
+        <h3>{title}</h3>
+        <p>{`const url = "${href}"`}</p>
+        <ul>
+          <li>
+            <button onClick={() => frontContext?.openUrl(href)}>
+              frontContext.openUrl(url)
+            </button>
+          </li>
+          <li>
+            <button onClick={() => frontContext?.openUrlInPopup(href, {})}>
+              frontContext.openUrlInPopup(url, {`{}`})
+            </button>
+          </li>
+        </ul>
+      </div>
+    );
+  }
+
+  // if (frontContext == null) {
+  //   return (
+  //     <div>
+  //       <p>Connecting to the Front context.</p>
+  //     </div>
+  //   );
+  // }
+  return (
+    <div className="app">
+      <h1>Plugin Test with SDK install</h1>
+      <h2>Anchor Links</h2>
+      <div className="flex-column">
+        {renderAnchorLinks(RELATIVE_HREF, 'Relative')}
+        {renderAnchorLinks(DIFFERENT_DOMAIN_HREF, 'Different Domain')}
+      </div>
+
+      <h2>JavaScript APIs</h2>
+      <div className="flex-column">
+        {renderJavaScriptApis(RELATIVE_HREF, 'Relative')}
+        {renderJavaScriptApis(DIFFERENT_DOMAIN_HREF, 'Different Domain')}
+      </div>
+
+      <h2>Front API</h2>
+      <div className="flex-column">
+        {renderFrontApi(RELATIVE_HREF, 'Relative')}
+        {renderFrontApi(DIFFERENT_DOMAIN_HREF, 'Different Domain')}
+      </div>
+    </div>
   );
 }

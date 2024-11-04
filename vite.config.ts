@@ -10,8 +10,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        about: resolve(__dirname, 'multi-page/about/index.html'),
-        login: resolve(__dirname, 'multi-page/login/index.html'),
+        relative: resolve(__dirname, 'relative/index.html'),
       },
     },
   },
