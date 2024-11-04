@@ -7,6 +7,20 @@
   </head>
   <body>
     <h2>Relative</h2>
-    <a href="javascript:window.history.back();">Back</a>
+    <button onclick="back()">Back</button>
+    <button onclick="printParent()">Print Parent</button>
+
+    <script>
+      function back() {
+        window.history.back();
+      }
+
+      function printParent() {
+        console.log('window.opener');
+        console.log(window.opener);
+        console.log('window.parent.document');
+        console.log(window.parent.document);
+      }
+    </script>
   </body>
 </html>
