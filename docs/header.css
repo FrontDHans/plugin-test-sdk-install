@@ -1,0 +1,13 @@
+.header {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+
+  .active {
+    font-weight: bold;
+    text-decoration: none;
+    pointer-events: none;
+    cursor: default;
+  }
+}
