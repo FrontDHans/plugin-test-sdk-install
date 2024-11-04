@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:preview": "npm run build && npm run preview"
+    "build:preview": "npm run build && npm run preview",
+    "build:prod": "rm -rf docs && npm run build && mv dist docs"
   },
   "dependencies": {
     "@frontapp/plugin-sdk": "^1.7.0",
