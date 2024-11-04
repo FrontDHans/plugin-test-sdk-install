@@ -20,7 +20,7 @@ import { FrontContext } from './providers/frontContext';
 const APP_BASE_URL = '/plugin-test-sdk-install/';
 const TARGET_COMBINATIONS = ['_self', '_blank', '_parent', '_top'];
 const RELATIVE_HREF = `${APP_BASE_URL}relative/`;
-const DIFFERENT_DOMAIN_HREF = 'https://google.com';
+const DIFFERENT_DOMAIN_HREF = 'https://example.com';
 
 export function App() {
   const frontContext = useContext(FrontContext);
@@ -32,7 +32,7 @@ export function App() {
         <p>{`<a href="${href}" >`}</p>
         <ul>
           {TARGET_COMBINATIONS.map((target) => (
-            <li>
+            <li key={target}>
               <a href={href} target={target}>
                 {target}
               </a>
@@ -50,7 +50,7 @@ export function App() {
         <p>{`const url = "${href}"`}</p>
         <ul>
           {TARGET_COMBINATIONS.map((target) => (
-            <li>
+            <li key={target}>
               <button
                 onClick={() => window.open(href, target)}
               >{`window.open(url, "${target}")`}</button>
